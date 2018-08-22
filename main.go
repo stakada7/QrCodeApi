@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/docgen"
+	"github.com/go-chi/jwtauth"
 	"github.com/go-chi/render"
 	"image/png"
 	"log"
@@ -21,6 +22,16 @@ import (
 )
 
 var routes = flag.Bool("routes", false, "Generate router documentation")
+var tokenAuth *jwtauth.JWTAuth
+
+func init() {
+	tokenAuth = jwtauth.New("HS256", []byte("engagemanager"), nil)
+
+	// For debugging/example purposes, we generate and print
+	// a sample jwt token with claims `user_id:123` here:
+	_, tokenString, _ := tokenAuth.Encode(jwtauth.Claims{"client_id": 123})
+	fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
+}
 
 func main() {
 	flag.Parse()
@@ -37,7 +48,13 @@ func main() {
 	r.Use(middleware.Timeout(2 * time.Second))
 
 	r.Get("/", responseRoot)
-	r.Post("/", responseQr)
+
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+		r.Use(jwtauth.Authenticator)
+
+		r.Post("/", responseQr)
+	})
 
 	if *routes {
 		fmt.Println(docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
@@ -60,6 +77,11 @@ func responseRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func responseQr(w http.ResponseWriter, r *http.Request) {
+
+	// TODO: レスポンスヘッダーに仕込むのではなく、Qrcodeurl構造体にbindするかログに残すか
+	_, claims, _ := jwtauth.FromContext(r.Context())
+	//w.Write([]byte(fmt.Sprintf("protected area. hi %v", claims["client_id"])))
+	w.Header().Set("Client-Id", fmt.Sprintf("%v", claims["client_id"]))
 
 	data := &Qrcodeurl{}
 	if err := render.Bind(r, data); err != nil {
