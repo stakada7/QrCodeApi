@@ -1,0 +1,10 @@
+vendor
+
+images/*
+!images/.gitkeep
+
+# for dep
+Gopkg.lock
+
+# for IntelliJ
+.idea/
