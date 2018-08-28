@@ -70,7 +70,7 @@ func main() {
 
 func responseRoot(w http.ResponseWriter, r *http.Request) {
 
-	data := &Qrcodeurl{Url: "http://www.tribalmedia.co.jp/"}
+	data := &Qrcodeurl{URL: "http://www.tribalmedia.co.jp/"}
 	qrCode := createQr(data)
 	createResponse(w, r, qrCode)
 
@@ -112,10 +112,10 @@ func createResponse(w http.ResponseWriter, r *http.Request, qrCode barcode.Barco
 
 func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
 
-	qrCode, _ = qr.Encode(data.Url, qr.H, qr.Auto)
+	qrCode, _ = qr.Encode(data.URL, qr.H, qr.Auto)
 	qrCode, _ = barcode.Scale(qrCode, 200, 200)
 
-	urlEnc := base64.StdEncoding.EncodeToString([]byte(data.Url))
+	urlEnc := base64.StdEncoding.EncodeToString([]byte(data.URL))
 	file, _ := os.Create("images/" + urlEnc)
 	defer file.Close()
 	png.Encode(file, qrCode)
@@ -148,14 +148,14 @@ func ErrInvalidRequest(err error) render.Renderer {
 }
 
 type Qrcodeurl struct {
-	Url string `json:"url"`
+	URL string `json:"url"`
 }
 
 func (q *Qrcodeurl) Bind(r *http.Request) error {
-	if q.Url == "" {
-		return errors.New("missing required Qrcodeurl fields.")
+	if q.URL == "" {
+		return errors.New("missing required Qrcodeurl fields. ")
 	}
-	log.Println(fmt.Sprintf("posted %s", q.Url))
+	log.Println(fmt.Sprintf("posted %s", q.URL))
 
 	return nil
 }
