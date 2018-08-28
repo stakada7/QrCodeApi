@@ -3,6 +3,9 @@ vendor
 images/*
 !images/.gitkeep
 
+bin/*
+!gin/.gitkeep
+
 # for dep
 Gopkg.lock
 
