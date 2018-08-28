@@ -124,6 +124,7 @@ func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
 
 }
 
+// ErrResponse ...
 type ErrResponse struct {
 	Err            error `json:"-"` // low-level runtime error
 	HTTPStatusCode int   `json:"-"` // http response status code
@@ -133,11 +134,13 @@ type ErrResponse struct {
 	ErrorText  string `json:"error,omitempty"` // application-level error message, for debugging
 }
 
+// Render ...
 func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, e.HTTPStatusCode)
 	return nil
 }
 
+// ErrInvalidRequest ...
 func ErrInvalidRequest(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
@@ -147,10 +150,12 @@ func ErrInvalidRequest(err error) render.Renderer {
 	}
 }
 
+// Qrcodeurl ...
 type Qrcodeurl struct {
 	URL string `json:"url"`
 }
 
+// Bind ...
 func (q *Qrcodeurl) Bind(r *http.Request) error {
 	if q.URL == "" {
 		return errors.New("missing required Qrcodeurl fields. ")
