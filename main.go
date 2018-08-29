@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"errors"
 	"flag"
 	"fmt"
@@ -16,6 +15,7 @@ import (
 	"image/png"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -115,7 +115,7 @@ func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
 	qrCode, _ = qr.Encode(data.URL, qr.H, qr.Auto)
 	qrCode, _ = barcode.Scale(qrCode, 200, 200)
 
-	urlEnc := base64.StdEncoding.EncodeToString([]byte(data.URL))
+	urlEnc := url.QueryEscape(data.URL)
 	file, _ := os.Create("images/" + urlEnc)
 	defer file.Close()
 	png.Encode(file, qrCode)
