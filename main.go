@@ -58,8 +58,8 @@ func main() {
 
 	if *routes {
 		fmt.Println(docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
-			ProjectPath: "github.com/stakada7.com/lnMsgSv",
-			Intro:       "Welcome to the lnMsgSv/ generated docs.",
+			ProjectPath: "github.com/tribalmedia/QrCodeApi",
+			Intro:       "Welcome to the QrCodeApi/ generated docs.",
 		}))
 		return
 	}
