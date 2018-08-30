@@ -30,7 +30,7 @@ func init() {
 
 	// For debugging/example purposes, we generate and print
 	// a sample jwt token with claims `user_id:123` here:
-	_, tokenString, _ := tokenAuth.Encode(jwtauth.Claims{"client_id": 123})
+	_, tokenString, _ := tokenAuth.Encode(jwtauth.Claims{"client_id": "123"})
 	fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
 }
 
@@ -122,7 +122,7 @@ func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
 	}
 	defer createlog.Close()
 
-	fmt.Fprintln(createlog, time.Now(), ",", data.CLIENTID, ",", urlEnc)
+	fmt.Fprintf(createlog, "%s,%s,%s\n", time.Now(), data.CLIENTID, urlEnc)
 
 	return qrCode
 
@@ -156,8 +156,8 @@ func ErrInvalidRequest(err error) render.Renderer {
 
 // Qrcodeurl ...
 type Qrcodeurl struct {
-	URL      string  `json:"url"`
-	CLIENTID float64 `json:"client_id"`
+	URL      string `json:"url"`
+	CLIENTID string `json:"client_id"`
 }
 
 // Bind ...
@@ -168,7 +168,7 @@ func (q *Qrcodeurl) Bind(r *http.Request) error {
 	log.Println(fmt.Sprintf("posted %s", q.URL))
 
 	_, claims, _ := jwtauth.FromContext(r.Context())
-	q.CLIENTID = claims["client_id"].(float64)
+	q.CLIENTID = fmt.Sprint(claims["client_id"])
 
 	return nil
 }
