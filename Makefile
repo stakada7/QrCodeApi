@@ -17,6 +17,9 @@ build-cross: $(SRC)  ## build binary linux and darwin
 	GOOS=linux GOARCH=amd64 go build -a -tags netgo -installsuffix netgo -o  bin/linux/amd64/qrcodeapi-${VERSION}/qrcodeapi ${SRC}
 	GOOS=darwin GOARCH=amd64 go build -a -tags netgo -installsuffix netgo -o  bin/darwin/amd64/qrcodeapi-${VERSION}/qrcodeapi ${SRC}
 
+fresh:  ## go run hot rebuild
+	fresh
+
 run:  ## go run
 	go run main.go
 
