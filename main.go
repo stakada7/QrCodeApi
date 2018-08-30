@@ -5,13 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/qr"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/docgen"
-	"github.com/go-chi/jwtauth"
-	"github.com/go-chi/render"
 	"image/png"
 	"log"
 	"net/http"
@@ -19,6 +12,14 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/qr"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/docgen"
+	"github.com/go-chi/jwtauth"
+	"github.com/go-chi/render"
 )
 
 var routes = flag.Bool("routes", false, "Generate router documentation")
@@ -78,11 +79,6 @@ func responseRoot(w http.ResponseWriter, r *http.Request) {
 
 func responseQr(w http.ResponseWriter, r *http.Request) {
 
-	// TODO: レスポンスヘッダーに仕込むのではなく、Qrcodeurl構造体にbindするかログに残すか
-	_, claims, _ := jwtauth.FromContext(r.Context())
-	//w.Write([]byte(fmt.Sprintf("protected area. hi %v", claims["client_id"])))
-	w.Header().Set("Client-Id", fmt.Sprintf("%v", claims["client_id"]))
-
 	data := &Qrcodeurl{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, ErrInvalidRequest(err))
@@ -120,6 +116,14 @@ func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
 	defer file.Close()
 	png.Encode(file, qrCode)
 
+	createlog, err := os.OpenFile("qrcreate.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	if err != nil {
+		log.Println("error create qrcreate.log file.")
+	}
+	defer createlog.Close()
+
+	fmt.Fprintln(createlog, time.Now(), ",", data.CLIENTID, ",", urlEnc)
+
 	return qrCode
 
 }
@@ -152,7 +156,8 @@ func ErrInvalidRequest(err error) render.Renderer {
 
 // Qrcodeurl ...
 type Qrcodeurl struct {
-	URL string `json:"url"`
+	URL      string  `json:"url"`
+	CLIENTID float64 `json:"client_id"`
 }
 
 // Bind ...
@@ -161,6 +166,9 @@ func (q *Qrcodeurl) Bind(r *http.Request) error {
 		return errors.New("missing required Qrcodeurl fields. ")
 	}
 	log.Println(fmt.Sprintf("posted %s", q.URL))
+
+	_, claims, _ := jwtauth.FromContext(r.Context())
+	q.CLIENTID = claims["client_id"].(float64)
 
 	return nil
 }
