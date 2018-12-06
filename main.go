@@ -61,7 +61,7 @@ func main() {
 
 	if *routes {
 		fmt.Println(docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
-			ProjectPath: "github.com/tribalmedia/QrCodeApi",
+			ProjectPath: "github.com/stakada7/QrCodeApi",
 			Intro:       "Welcome to the QrCodeApi/ generated docs.",
 		}))
 		return
@@ -92,7 +92,7 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 
 func responseRoot(w http.ResponseWriter, r *http.Request) {
 
-	data := &Qrcodeurl{URL: "http://www.tribalmedia.co.jp/"}
+	data := &Qrcodeurl{URL: "https://stakada7.com/"}
 	qrCode := createQr(data)
 	createResponse(w, r, qrCode)
 
@@ -177,8 +177,8 @@ func ErrInvalidRequest(err error) render.Renderer {
 
 // Qrcodeurl ...
 type Qrcodeurl struct {
-	URL      string `json:"url"`
-	CLIENTID string `json:"client_id"`
+	URL         string `json:"url"`
+	CLIENTID    string `json:"client_id"`
 	CREATEDTIME string `json:created_time`
 }
 
