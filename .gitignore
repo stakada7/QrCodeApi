@@ -6,6 +6,11 @@ images/*
 bin/*
 !gin/.gitkeep
 
+tmp/*
+!tmp/.gitkeep
+
+qrcreate.log
+
 # for dep
 Gopkg.lock
 
