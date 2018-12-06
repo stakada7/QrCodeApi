@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"flag"
@@ -55,6 +56,7 @@ func main() {
 		r.Use(jwtauth.Authenticator)
 
 		r.Post("/", responseQr)
+		r.Get("/list", qrList)
 	})
 
 	if *routes {
@@ -66,6 +68,25 @@ func main() {
 	}
 
 	http.ListenAndServe(":3333", r)
+
+}
+
+func qrList(w http.ResponseWriter, r *http.Request) {
+
+	f, err := os.Open("qrcreate.log")
+	if err != nil {
+		log.Println("unable open qrcreate.log file.")
+	}
+	defer f.Close()
+
+	s := bufio.NewScanner(f)
+	for i := 0; i < 10; i++ {
+		s.Scan()
+		log.Println(s.Text())
+	}
+	if err := s.Err(); err != nil {
+		log.Println("error read qrcreate.log file.")
+	}
 
 }
 
@@ -122,7 +143,7 @@ func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
 	}
 	defer createlog.Close()
 
-	fmt.Fprintf(createlog, "%s,%s,%s\n", time.Now(), data.CLIENTID, urlEnc)
+	fmt.Fprintf(createlog, "%s,%s,%s\n", data.CREATEDTIME, data.CLIENTID, data.URL)
 
 	return qrCode
 
@@ -158,6 +179,7 @@ func ErrInvalidRequest(err error) render.Renderer {
 type Qrcodeurl struct {
 	URL      string `json:"url"`
 	CLIENTID string `json:"client_id"`
+	CREATEDTIME string `json:created_time`
 }
 
 // Bind ...
@@ -169,6 +191,8 @@ func (q *Qrcodeurl) Bind(r *http.Request) error {
 
 	_, claims, _ := jwtauth.FromContext(r.Context())
 	q.CLIENTID = fmt.Sprint(claims["client_id"])
+
+	q.CREATEDTIME = time.Now().String()
 
 	return nil
 }
