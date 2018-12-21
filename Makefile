@@ -31,10 +31,10 @@ lint:  ## code check
 	golint -set_exit_status main.go
 
 deps:  ## dependency install
-	dep ensure -v
+	dep ensure -vendor-only -v
 
 up:  ## dependency update
-	dep ensure -v update
+	dep ensure update -v
 
 clean:  ## clean bin, vendor, tmp dir
 	rm -rf bin/*
