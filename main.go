@@ -16,6 +16,7 @@ import (
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/docgen"
@@ -31,7 +32,7 @@ func init() {
 
 	// For debugging/example purposes, we generate and print
 	// a sample jwt token with claims `user_id:123` here:
-	_, tokenString, _ := tokenAuth.Encode(jwtauth.Claims{"client_id": "123"})
+	_, tokenString, _ := tokenAuth.Encode(jwt.MapClaims{"client_id": "123"})
 	fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
 }
 
