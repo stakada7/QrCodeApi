@@ -4,6 +4,35 @@ Response QR Code images.
 
 please keep simple, small, smart. thanks.
 
+# Status
+Development only.
+
+# Requirement
+go1.11 or later(including `$GOPATH` setup).
+
+# Installation
+
+clone the source code by running the following command.
+```
+$ mkdir -p $GOPATH/src/github.com/stakada7
+$ cd $GOPATH/src/github.com/stakada7
+$ git clone git@github.com:stakada7/QrCodeApi.git
+```
+
+To fetch dependencies and build, run the following make tasks,
+```
+make
+```
+
+# Usage
+
+To run `qrcodeapi`
+```
+$ bin/{YOUR_OS}/{YOUR_ARCH}/{VERSION}/qrcodeapi
+```
+
+# Specification
+
 # benchmark
 
 ```
