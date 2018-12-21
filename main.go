@@ -180,7 +180,7 @@ func ErrInvalidRequest(err error) render.Renderer {
 type Qrcodeurl struct {
 	URL         string `json:"url"`
 	CLIENTID    string `json:"client_id"`
-	CREATEDTIME string `json:created_time`
+	CREATEDTIME string `json:"created_time"`
 }
 
 // Bind ...
