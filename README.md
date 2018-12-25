@@ -33,6 +33,29 @@ $ bin/{YOUR_OS}/{YOUR_ARCH}/{VERSION}/qrcodeapi
 
 # Specification
 
+- `GET /`
+
+Sample API. Development only. Response Sample QRCode.
+
+
+- `GET /ping`
+
+Health Check endpoint.
+
+- `POST /`
+
+Create QRCode API. You Should add HEADER and BODY.
+
+```
+curl -X POST http://localhost:3333/ -H 'authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXX' -d '{"Url":"https://www.youtube.com/watch?v=EC0BvUaD_Rk"}'
+```
+
+- `GET /list`
+
+```
+curl http://localhost:3333/list -H 'authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXX'
+```
+
 # benchmark
 
 ```
