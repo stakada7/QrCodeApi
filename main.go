@@ -81,8 +81,7 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 	defer f.Close()
 
 	s := bufio.NewScanner(f)
-	for i := 0; i < 10; i++ {
-		s.Scan()
+	for s.Scan() {
 		log.Println(s.Text())
 	}
 	if err := s.Err(); err != nil {
