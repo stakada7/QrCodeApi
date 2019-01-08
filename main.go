@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -74,6 +75,8 @@ func main() {
 
 func qrList(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Content-Type", "application/json")
+
 	f, err := os.Open("qrcreate.log")
 	if err != nil {
 		log.Println("unable open qrcreate.log file.")
@@ -87,18 +90,20 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 		log.Println("error read qrcreate.log file.")
 	}
 
-	// var qrcodeurls []Qrcodeurl
+	var qrlist qrlist
 	for _, line := range record {
-		// url := Qrcodeurl{URL: line[0], CLIENTID: line[1], CREATEDTIME: line[2]}
-		// qrcodeurls = append(qrcodeurls, url)
-		log.Printf("%s,%s,%s", line[0], line[1], line[2])
+		info := qrcodeinfo{URL: line[0], CLIENTID: line[1], CREATEDTIME: line[2]}
+		qrlist.List = append(qrlist.List, info)
 	}
+
+	j, _ := json.Marshal(qrlist)
+	w.Write(j)
 
 }
 
 func responseRoot(w http.ResponseWriter, r *http.Request) {
 
-	data := &Qrcodeurl{URL: "https://stakada7.com/"}
+	data := &qrcodeinfo{URL: "https://stakada7.com/"}
 	qrCode := createQr(data)
 	createResponse(w, r, qrCode)
 
@@ -106,7 +111,7 @@ func responseRoot(w http.ResponseWriter, r *http.Request) {
 
 func responseQr(w http.ResponseWriter, r *http.Request) {
 
-	data := &Qrcodeurl{}
+	data := &qrcodeinfo{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, ErrInvalidRequest(err))
 		return
@@ -133,7 +138,7 @@ func createResponse(w http.ResponseWriter, r *http.Request, qrCode barcode.Barco
 
 }
 
-func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
+func createQr(data *qrcodeinfo) (qrCode barcode.Barcode) {
 
 	qrCode, _ = qr.Encode(data.URL, qr.H, qr.Auto)
 	qrCode, _ = barcode.Scale(qrCode, 200, 200)
@@ -187,17 +192,22 @@ func ErrInvalidRequest(err error) render.Renderer {
 	}
 }
 
-// Qrcodeurl ...
-type Qrcodeurl struct {
+// qrcodeinfo ...
+type qrcodeinfo struct {
 	URL         string `json:"url"`
 	CLIENTID    string `json:"client_id"`
 	CREATEDTIME string `json:"created_time"`
 }
 
+// qrlist ...
+type qrlist struct {
+	List []qrcodeinfo `json:"list"`
+}
+
 // Bind ...
-func (q *Qrcodeurl) Bind(r *http.Request) error {
+func (q *qrcodeinfo) Bind(r *http.Request) error {
 	if q.URL == "" {
-		return errors.New("missing required Qrcodeurl fields. ")
+		return errors.New("missing required qrcodeinfo fields. ")
 	}
 	log.Println(fmt.Sprintf("posted %s", q.URL))
 
