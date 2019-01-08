@@ -44,13 +44,15 @@ Health Check endpoint.
 
 - `POST /`
 
-Create QRCode API. You Should add HEADER and BODY.
+Create QRCode API. You should add HEADER and BODY.
 
 ```
 curl -X POST http://localhost:3333/ -H 'authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXX' -d '{"Url":"https://www.youtube.com/watch?v=EC0BvUaD_Rk"}'
 ```
 
 - `GET /list`
+
+Response QRCode list API. format json. You should add HEADER.
 
 ```
 curl http://localhost:3333/list -H 'authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXX'
