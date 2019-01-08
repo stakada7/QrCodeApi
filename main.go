@@ -92,7 +92,7 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 
 	var qrlist qrlist
 	for _, line := range record {
-		info := qrcodeinfo{URL: line[0], CLIENTID: line[1], CREATEDTIME: line[2]}
+		info := qrcodeinfo{CREATEDTIME: line[0], CLIENTID: line[1], URL: line[2]}
 		qrlist.List = append(qrlist.List, info)
 	}
 
