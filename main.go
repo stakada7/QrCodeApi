@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
+	"encoding/csv"
 	"errors"
 	"flag"
 	"fmt"
@@ -80,12 +80,18 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 	}
 	defer f.Close()
 
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		log.Println(s.Text())
-	}
-	if err := s.Err(); err != nil {
+	reader := csv.NewReader(f)
+	reader.FieldsPerRecord = -1
+	record, err := reader.ReadAll()
+	if err != nil {
 		log.Println("error read qrcreate.log file.")
+	}
+
+	// var qrcodeurls []Qrcodeurl
+	for _, line := range record {
+		// url := Qrcodeurl{URL: line[0], CLIENTID: line[1], CREATEDTIME: line[2]}
+		// qrcodeurls = append(qrcodeurls, url)
+		log.Printf("%s,%s,%s", line[0], line[1], line[2])
 	}
 
 }
@@ -133,17 +139,23 @@ func createQr(data *Qrcodeurl) (qrCode barcode.Barcode) {
 	qrCode, _ = barcode.Scale(qrCode, 200, 200)
 
 	urlEnc := url.QueryEscape(data.URL)
-	file, _ := os.Create("images/" + urlEnc)
-	defer file.Close()
-	png.Encode(file, qrCode)
+	p, _ := os.Create("images/" + urlEnc)
+	defer p.Close()
+	png.Encode(p, qrCode)
 
-	createlog, err := os.OpenFile("qrcreate.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	f, err := os.OpenFile("qrcreate.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		log.Println("error create qrcreate.log file.")
 	}
-	defer createlog.Close()
+	defer f.Close()
 
-	fmt.Fprintf(createlog, "%s,%s,%s\n", data.CREATEDTIME, data.CLIENTID, data.URL)
+	writer := csv.NewWriter(f)
+	l := []string{data.CREATEDTIME, data.CLIENTID, data.URL}
+	err = writer.Write(l)
+	if err != nil {
+		log.Println("error write qrcreate.log file.")
+	}
+	writer.Flush()
 
 	return qrCode
 
