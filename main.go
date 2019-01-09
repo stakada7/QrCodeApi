@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -17,7 +16,7 @@ import (
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/docgen"
@@ -75,8 +74,6 @@ func main() {
 
 func qrList(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Content-Type", "application/json")
-
 	f, err := os.Open("qrcreate.log")
 	if err != nil {
 		log.Println("unable open qrcreate.log file.")
@@ -96,8 +93,7 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 		qrlist.List = append(qrlist.List, info)
 	}
 
-	j, _ := json.Marshal(qrlist)
-	w.Write(j)
+	render.JSON(w, r, qrlist)
 
 }
 
