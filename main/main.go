@@ -96,7 +96,8 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 
 	f, err := os.Open("qrcreate.log")
 	if err != nil {
-		log.Println("unable open qrcreate.log file.")
+		render.Render(w, r, errInvalidRequest(err))
+		return
 	}
 	defer f.Close()
 
@@ -104,7 +105,8 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 	reader.FieldsPerRecord = -1
 	record, err := reader.ReadAll()
 	if err != nil {
-		log.Println("error read qrcreate.log file.")
+		render.Render(w, r, errInvalidRequest(err))
+		return
 	}
 
 	var qrlist qrlist
