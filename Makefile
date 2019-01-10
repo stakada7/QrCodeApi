@@ -1,7 +1,7 @@
 # http://mshim.jp/web-develop/programming/golang/golang-makefile/
 
 VERSION=0.1.0
-SRC=main.go
+SRC=main/main.go
 
 .PHONY: $(/bin/bash egrep -o ^[a-zA-Z_-]+: $(MAKEFILE_LIST) | sed 's/://')
 
@@ -21,14 +21,14 @@ fresh:  ## go run hot rebuild
 	fresh
 
 run:  ## go run
-	go run main.go
+	go run main/main.go
 
 test:  ## unit test
 	go test -v -cover ./...
 
 lint:  ## code check
 	go vet ./...
-	golint -set_exit_status main.go
+	golint -set_exit_status main/main.go
 
 deps:  ## dependency install
 	dep ensure -vendor-only -v
