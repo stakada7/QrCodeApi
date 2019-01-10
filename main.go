@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/boombuler/barcode/qr"
 	"image/png"
 	"log"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/qr"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -72,6 +72,26 @@ func main() {
 
 }
 
+func responseRoot(w http.ResponseWriter, r *http.Request) {
+
+	data := &qrcodeinfo{URL: "https://stakada7.com/"}
+	qrCode := createQr(data)
+	createResponse(w, r, qrCode)
+
+}
+
+func responseQr(w http.ResponseWriter, r *http.Request) {
+
+	data := &qrcodeinfo{}
+	if err := render.Bind(r, data); err != nil {
+		render.Render(w, r, errInvalidRequest(err))
+		return
+	}
+	qrCode := createQr(data)
+	createResponse(w, r, qrCode)
+
+}
+
 func qrList(w http.ResponseWriter, r *http.Request) {
 
 	f, err := os.Open("qrcreate.log")
@@ -94,43 +114,6 @@ func qrList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, qrlist)
-
-}
-
-func responseRoot(w http.ResponseWriter, r *http.Request) {
-
-	data := &qrcodeinfo{URL: "https://stakada7.com/"}
-	qrCode := createQr(data)
-	createResponse(w, r, qrCode)
-
-}
-
-func responseQr(w http.ResponseWriter, r *http.Request) {
-
-	data := &qrcodeinfo{}
-	if err := render.Bind(r, data); err != nil {
-		render.Render(w, r, ErrInvalidRequest(err))
-		return
-	}
-	qrCode := createQr(data)
-	createResponse(w, r, qrCode)
-
-}
-
-func createResponse(w http.ResponseWriter, r *http.Request, qrCode barcode.Barcode) {
-
-	w.Header().Set("Content-Type", "image/png")
-
-	buf := new(bytes.Buffer)
-	if err := png.Encode(buf, qrCode); err != nil {
-		log.Println("unable to encode png.")
-	}
-
-	w.Header().Set("Content-Length", strconv.Itoa(len(buf.Bytes())))
-
-	if _, err := w.Write(buf.Bytes()); err != nil {
-		log.Println("unable to write image.")
-	}
 
 }
 
@@ -162,8 +145,25 @@ func createQr(data *qrcodeinfo) (qrCode barcode.Barcode) {
 
 }
 
-// ErrResponse ...
-type ErrResponse struct {
+func createResponse(w http.ResponseWriter, r *http.Request, qrCode barcode.Barcode) {
+
+	w.Header().Set("Content-Type", "image/png")
+
+	buf := new(bytes.Buffer)
+	if err := png.Encode(buf, qrCode); err != nil {
+		log.Println("unable to encode png.")
+	}
+
+	w.Header().Set("Content-Length", strconv.Itoa(len(buf.Bytes())))
+
+	if _, err := w.Write(buf.Bytes()); err != nil {
+		log.Println("unable to write image.")
+	}
+
+}
+
+// errResponse ...
+type errResponse struct {
 	Err            error `json:"-"` // low-level runtime error
 	HTTPStatusCode int   `json:"-"` // http response status code
 
@@ -173,14 +173,14 @@ type ErrResponse struct {
 }
 
 // Render ...
-func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
+func (e *errResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, e.HTTPStatusCode)
 	return nil
 }
 
-// ErrInvalidRequest ...
-func ErrInvalidRequest(err error) render.Renderer {
-	return &ErrResponse{
+// errInvalidRequest ...
+func errInvalidRequest(err error) render.Renderer {
+	return &errResponse{
 		Err:            err,
 		HTTPStatusCode: 400,
 		StatusText:     "Invalid request.",
@@ -188,16 +188,16 @@ func ErrInvalidRequest(err error) render.Renderer {
 	}
 }
 
+// qrlist ...
+type qrlist struct {
+	List []qrcodeinfo `json:"list"`
+}
+
 // qrcodeinfo ...
 type qrcodeinfo struct {
 	URL         string `json:"url"`
 	CLIENTID    string `json:"client_id"`
 	CREATEDTIME string `json:"created_time"`
-}
-
-// qrlist ...
-type qrlist struct {
-	List []qrcodeinfo `json:"list"`
 }
 
 // Bind ...
