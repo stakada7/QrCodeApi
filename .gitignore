@@ -4,7 +4,7 @@ images/*
 !images/.gitkeep
 
 bin/*
-!gin/.gitkeep
+!bin/.gitkeep
 
 tmp/*
 !tmp/.gitkeep
