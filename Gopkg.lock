@@ -22,15 +22,15 @@
   version = "v3.2.0"
 
 [[projects]]
-  digest = "1:631757aef84dd471e4ba8242ac6affcccfc2c4c6d9c8c45e47b0d8fe8fd82de1"
+  digest = "1:10d6aa505e0698b315d19aa9fe91bcf8e7cb3fa93a7acca41f1b41c6e669050b"
   name = "github.com/go-chi/chi"
   packages = [
     ".",
     "middleware",
   ]
   pruneopts = "UT"
-  revision = "1a6bb108ccf279c8dac6f9bad857d773b4f9b421"
-  version = "v4.0.1"
+  revision = "2db61557f36b2f4caa20ce6ef50e98bac0f7fce5"
+  version = "v4.0.3"
 
 [[projects]]
   digest = "1:bcd7c6fe3da916b9887cb91340bf52feae66b0064bb40a292040208326c86505"
